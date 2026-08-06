@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Obsidian — локальное состояние интерфейса
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache/
+.trash/
+
+# Временные файлы редакторов
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+~$*
+
+# Локальные настройки
+.env
+.env.*
+!.env.example
