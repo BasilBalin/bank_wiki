@@ -11,7 +11,7 @@ export PATH="/Users/vasilijbalin/.cache/codex-runtimes/codex-primary-runtime/dep
 
 ```bash
 # перейти в папку проекта; команда ничего не изменяет
-cd '/Users/vasilijbalin/Documents/Банковская ВИКИ'
+cd '/Users/vasilijbalin/python/projects/bank_wiki'
 
 # запустить тестовую версию на http://localhost:3000; процесс работает до Ctrl+C
 pnpm run dev

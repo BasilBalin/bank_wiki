@@ -1,8 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  FOUNDATION_ARTICLES,
+  FOUNDATION_CARDS,
+  FOUNDATION_PAGES,
+  FOUNDATION_QUIZZES,
+  type FoundationPageId,
+} from "./foundation-content";
 
-type PageId = "client-base" | "segmentation";
+type PageId = FoundationPageId | "client-base" | "segmentation";
+
+type PageConfig = {
+  title: string;
+  eyebrow: string;
+  summary: string;
+  href: string;
+  time: string;
+  color: string;
+  searchText: string;
+  image?: string;
+  imageAlt?: string;
+  imagePosition?: string;
+  imageCredit?: { label: string; url: string };
+  visualLabels?: readonly [string, string, string];
+};
 
 type GlossaryTerm = {
   name: string;
@@ -27,7 +50,8 @@ type Question = {
   explanation: string;
 };
 
-const PAGES = {
+const PAGES: Record<PageId, PageConfig> = {
+  ...FOUNDATION_PAGES,
   "client-base": {
     title: "Клиентская база УК",
     eyebrow: "Модуль 1 · основа",
@@ -56,7 +80,7 @@ const PAGES = {
     searchText:
       "сегментация клиентская база признаки целевая переменная когорта кластер правило бизнес сегмент отток докупка корреляция причинность data leakage утечка A/B тест контрольная тестовая группа конверсия uplift Power BI отчет кампания эффективность коммуникации",
   },
-} as const;
+};
 
 const GLOSSARY: GlossaryTerm[] = [
   {
@@ -254,6 +278,7 @@ const CARDS: Card[] = [
     tags: "bankwiki experiment metrics",
     page: "segmentation",
   },
+  ...FOUNDATION_CARDS,
 ];
 
 const QUIZZES: Record<PageId, Question[]> = {
@@ -327,6 +352,7 @@ const QUIZZES: Record<PageId, Question[]> = {
         "Контроль приближает контрфактический сценарий и помогает отделить эффект кампании от фоновых изменений.",
     },
   ],
+  ...FOUNDATION_QUIZZES,
 };
 
 function useStoredSet(key: string) {
@@ -334,13 +360,19 @@ function useStoredSet(key: string) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    let saved = new Set<string>();
     try {
-      const saved = JSON.parse(localStorage.getItem(key) ?? "[]") as string[];
-      setValues(new Set(saved));
+      saved = new Set(JSON.parse(localStorage.getItem(key) ?? "[]") as string[]);
     } catch {
-      setValues(new Set());
+      saved = new Set();
     }
-    setReady(true);
+    queueMicrotask(() => {
+      if (!active) return;
+      setValues(saved);
+      setReady(true);
+    });
+    return () => { active = false; };
   }, [key]);
 
   const toggle = (value: string) => {
@@ -589,12 +621,12 @@ function ClientBaseArticle({ onTerm }: { onTerm: (name: string) => void }) {
           <li><span>05</span><p><b>Каково окно?</b> 7, 30, 90 дней — и почему?</p></li>
           <li><span>06</span><p><b>Какие исключения?</b> Служебные операции, дубли, закрытые договоры, особые статусы.</p></li>
         </ol>
-        <a className="next-article-card" href="/segmentation">
+        <Link className="next-article-card" href="/segmentation">
           <span>Следующая статья</span>
           <strong>Сегментация клиентской базы</strong>
           <p>Превратим набор сущностей и событий в группы, с которыми можно работать.</p>
           <b>Перейти →</b>
-        </a>
+        </Link>
       </section>
     </>
   );
@@ -728,12 +760,93 @@ function SegmentationArticle({ onTerm }: { onTerm: (name: string) => void }) {
           <li>для каждого сегмента сформулировано действие и ограничение;</li>
           <li>эффект будущего изменения можно проверить на контроле.</li>
         </ul>
-        <a className="next-article-card back" href="/">
+        <Link className="next-article-card back" href="/">
           <span>Связанная основа</span>
           <strong>Клиентская база УК</strong>
           <p>Вернитесь к сущностям, событиям и определениям докупки и оттока.</p>
           <b>Открыть статью →</b>
-        </a>
+        </Link>
+      </section>
+    </>
+  );
+}
+
+function FoundationHeroVisual({
+  labels,
+  index,
+}: {
+  labels: readonly [string, string, string];
+  index: number;
+}) {
+  return (
+    <div className="hero-topic-visual" aria-hidden="true">
+      <span className="hero-orbit orbit-one"></span>
+      <span className="hero-orbit orbit-two"></span>
+      <strong>{String(index + 1).padStart(2, "0")}</strong>
+      <div className="topic-chip chip-one">{labels[0]}</div>
+      <div className="topic-chip chip-two">{labels[1]}</div>
+      <div className="topic-chip chip-three">{labels[2]}</div>
+    </div>
+  );
+}
+
+function FoundationArticle({ pageId }: { pageId: FoundationPageId }) {
+  const article = FOUNDATION_ARTICLES[pageId];
+
+  return (
+    <>
+      <section className="article-section" id="meaning">
+        <span className="kicker">Смысл</span>
+        <h2>Сначала соберите рамку решения</h2>
+        <p className="lead">{article.lead}</p>
+        <div className="definition-card">
+          <span>Главная мысль</span>
+          <strong>{article.takeaway}</strong>
+        </div>
+      </section>
+
+      <section className="article-section" id="concepts">
+        <span className="kicker">Ключевые понятия</span>
+        <h2>{article.conceptsTitle}</h2>
+        <div className="concept-grid">
+          {article.concepts.map((concept, index) => (
+            <article key={concept.title}>
+              <b>{String(index + 1).padStart(2, "0")}</b>
+              <h3>{concept.title}</h3>
+              <p>{concept.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="article-section" id="practice">
+        <span className="kicker">Практика</span>
+        <h2>{article.practiceTitle}</h2>
+        <p>{article.practiceLead}</p>
+        <div className="steps-stack">
+          {article.steps.map((step, index) => (
+            <article key={step.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div><h3>{step.title}</h3><p>{step.text}</p></div>
+            </article>
+          ))}
+        </div>
+        <div className="example-card">
+          <span>{article.exampleLabel}</span>
+          <p>{article.example}</p>
+        </div>
+        <aside className="warning-card">
+          <span>Типичная ошибка</span>
+          <p>{article.warning}</p>
+        </aside>
+      </section>
+
+      <section className="article-section" id="checklist-foundation">
+        <span className="kicker">Проверка понимания</span>
+        <h2>{article.checklistTitle}</h2>
+        <ul className="done-list">
+          {article.checklist.map((item) => <li key={item}>{item}</li>)}
+        </ul>
       </section>
     </>
   );
@@ -741,6 +854,12 @@ function SegmentationArticle({ onTerm }: { onTerm: (name: string) => void }) {
 
 export default function WikiApp({ pageId }: { pageId: PageId }) {
   const page = PAGES[pageId];
+  const pageEntries = Object.entries(PAGES) as [PageId, PageConfig][];
+  const pageIndex = pageEntries.findIndex(([id]) => id === pageId);
+  const previousPage = pageEntries[pageIndex - 1];
+  const nextPage = pageEntries[pageIndex + 1];
+  const pageCardCount = CARDS.filter((card) => card.page === pageId).length;
+  const pageCount = pageEntries.length;
   const favorites = useStoredSet("bankwiki:favorites");
   const learned = useStoredSet("bankwiki:learned");
   const [query, setQuery] = useState("");
@@ -841,18 +960,18 @@ export default function WikiApp({ pageId }: { pageId: PageId }) {
   return (
     <div className="wiki-shell">
       <aside className="sidebar">
-        <a className="brand" href="/" aria-label="БанкВики — на главную">
+        <Link className="brand" href="/investment-basics" aria-label="БанкВики — к началу курса">
           <span>БВ</span>
           <div><strong>БанкВики</strong><small>вторичные продажи</small></div>
-        </a>
-        <div className="course-label">MVP · 2 статьи</div>
+        </Link>
+        <div className="course-label">Учебный маршрут · {pageCount} статей</div>
         <nav className="course-nav" aria-label="Учебные статьи">
-          {(Object.entries(PAGES) as [PageId, (typeof PAGES)[PageId]][]).map(([id, item], index) => (
-            <a href={item.href} className={id === pageId ? "active" : ""} key={id}>
+          {pageEntries.map(([id, item], index) => (
+            <Link href={item.href} className={id === pageId ? "active" : ""} key={id}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <div><strong>{item.title}</strong><small>{item.time}</small></div>
               {learned.values.has(id) && <b aria-label="Изучено">✓</b>}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="sidebar-tools">
@@ -861,8 +980,8 @@ export default function WikiApp({ pageId }: { pageId: PageId }) {
           <button type="button" onClick={exportCards}><span>⇩</span> Экспорт TSV</button>
         </div>
         <div className="progress-card">
-          <div className="progress-ring" style={{ "--progress": `${(learnedCount / 2) * 360}deg` } as React.CSSProperties}>
-            <span>{learnedCount}/2</span>
+          <div className="progress-ring" style={{ "--progress": `${(learnedCount / pageCount) * 360}deg` } as React.CSSProperties}>
+            <span>{learnedCount}/{pageCount}</span>
           </div>
           <div><strong>Ваш прогресс</strong><small>Хранится только в этом браузере</small></div>
         </div>
@@ -888,9 +1007,9 @@ export default function WikiApp({ pageId }: { pageId: PageId }) {
                       <span>{result.type}</span><strong>{result.title}</strong><small>{result.text}</small>
                     </button>
                   ) : (
-                    <a key={`${result.type}-${result.id}`} href={result.href}>
+                    <Link key={`${result.type}-${result.id}`} href={result.href}>
                       <span>{result.type}</span><strong>{result.title}</strong><small>{result.text}</small>
-                    </a>
+                    </Link>
                   )
                 )) : <p>Ничего не найдено. Попробуйте другой термин.</p>}
               </div>
@@ -916,39 +1035,73 @@ export default function WikiApp({ pageId }: { pageId: PageId }) {
 
         <article className="article">
           <section className={`hero ${page.color}`}>
-            <img src={page.image} alt={page.imageAlt} />
+            {page.image ? (
+              // Vinext dev has no ASSETS binding for the next/image optimization route.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={page.image}
+                alt={page.imageAlt ?? ""}
+                style={{ objectPosition: page.imagePosition }}
+              />
+            ) : (
+              <FoundationHeroVisual
+                labels={page.visualLabels ?? ["цель", "риск", "решение"]}
+                index={pageIndex}
+              />
+            )}
             <div className="hero-overlay"></div>
             <div className="hero-copy">
               <span>{page.eyebrow}</span>
               <h1>{page.title}</h1>
               <p>{page.summary}</p>
-              <div><b>{page.time}</b><b>Уровень: с нуля</b><b>5 карточек · 3 вопроса</b></div>
+              <div><b>{page.time}</b><b>Уровень: с нуля</b><b>{pageCardCount} карточек · {QUIZZES[pageId].length} вопроса</b></div>
             </div>
           </section>
 
           <div className="article-meta">
-            <span>Обновлено 6 августа 2026</span>
+            <span>Обновлено 9 августа 2026</span>
             <span>·</span>
             <span>Материал для обучения, не инвестиционная рекомендация</span>
+            {page.imageCredit && (
+              <>
+                <span>·</span>
+                <a href={page.imageCredit.url} target="_blank" rel="noreferrer">
+                  Фото: {page.imageCredit.label}
+                </a>
+              </>
+            )}
           </div>
 
           {pageId === "client-base" ? (
             <ClientBaseArticle onTerm={openTerm} />
-          ) : (
+          ) : pageId === "segmentation" ? (
             <SegmentationArticle onTerm={openTerm} />
+          ) : (
+            <FoundationArticle pageId={pageId} />
           )}
 
           <Quiz questions={QUIZZES[pageId]} />
           <Flashcards pageId={pageId} />
 
           <section className="backlinks" id="backlinks">
-            <span className="kicker">Обратные ссылки</span>
-            <h2>На эту страницу ссылаются</h2>
-            {pageId === "client-base" ? (
-              <a href="/segmentation"><span>02</span><div><strong>Сегментация клиентской базы</strong><small>Раздел «Проверка результата»</small></div><b>→</b></a>
-            ) : (
-              <a href="/"><span>01</span><div><strong>Клиентская база УК</strong><small>Раздел «Первый рабочий алгоритм»</small></div><b>→</b></a>
-            )}
+            <span className="kicker">Учебный маршрут</span>
+            <h2>Продолжить изучение</h2>
+            <div className="backlink-list">
+              {previousPage && (
+                <Link href={previousPage[1].href}>
+                  <span>{String(pageIndex).padStart(2, "0")}</span>
+                  <div><strong>{previousPage[1].title}</strong><small>Предыдущая статья</small></div>
+                  <b>←</b>
+                </Link>
+              )}
+              {nextPage && (
+                <Link href={nextPage[1].href}>
+                  <span>{String(pageIndex + 2).padStart(2, "0")}</span>
+                  <div><strong>{nextPage[1].title}</strong><small>Следующая статья</small></div>
+                  <b>→</b>
+                </Link>
+              )}
+            </div>
           </section>
 
           <footer className="article-footer">

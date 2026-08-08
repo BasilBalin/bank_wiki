@@ -43,3 +43,27 @@ test("renders the linked segmentation article", async () => {
   assert.match(html, /Минимальная схема A\/B-теста/);
   assert.match(html, /Power BI/);
 });
+
+const foundationPages = [
+  ["/investment-basics", /Инвестиции: цели, смысл и границы/],
+  ["/financial-goals", /Финансовые цели инвестора/],
+  ["/risk-return", /Риск и доходность/],
+  ["/horizon-liquidity", /Горизонт и ликвидность/],
+  ["/inflation-real-return", /Инфляция и реальная доходность/],
+  ["/compound-interest", /Сложный процент и время/],
+  ["/investor-profile", /Профиль инвестора/],
+  ["/asset-classes", /Основные классы активов/],
+];
+
+for (const [path, heading] of foundationPages) {
+  test(`renders the foundation article at ${path}`, async () => {
+    const response = await render(path);
+    assert.equal(response.status, 200);
+
+    const html = await response.text();
+    assert.match(html, heading);
+    assert.match(html, /Три вопроса без подвоха/);
+    assert.match(html, /Карточки по странице/);
+    assert.match(html, /Материал для обучения, не инвестиционная рекомендация/);
+  });
+}
