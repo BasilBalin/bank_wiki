@@ -45,23 +45,24 @@ test("renders the linked segmentation article", async () => {
 });
 
 const foundationPages = [
-  ["/investment-basics", /Инвестиции: цели, смысл и границы/],
-  ["/financial-goals", /Финансовые цели инвестора/],
-  ["/risk-return", /Риск и доходность/],
-  ["/horizon-liquidity", /Горизонт и ликвидность/],
-  ["/inflation-real-return", /Инфляция и реальная доходность/],
-  ["/compound-interest", /Сложный процент и время/],
-  ["/investor-profile", /Профиль инвестора/],
-  ["/asset-classes", /Основные классы активов/],
+  ["/investment-basics", /Инвестиции: цели, смысл и границы/, /Продукт появляется в самом конце/],
+  ["/financial-goals", /Финансовые цели инвестора/, /Желание становится расчётной задачей/],
+  ["/risk-return", /Риск и доходность/, /Одна ожидаемая доходность скрывает разные исходы/],
+  ["/horizon-liquidity", /Горизонт и ликвидность/, /Деньги получают разную свободу движения/],
+  ["/inflation-real-return", /Инфляция и реальная доходность/, /Рост суммы ещё не означает рост возможностей/],
+  ["/compound-interest", /Сложный процент и время/, /Доход начинает приносить новый доход/],
+  ["/investor-profile", /Профиль инвестора/, /Допустимый риск задаёт самое слабое звено/],
+  ["/asset-classes", /Основные классы активов/, /Класс актива выбирают по функции в портфеле/],
 ];
 
-for (const [path, heading] of foundationPages) {
+for (const [path, heading, visualHeading] of foundationPages) {
   test(`renders the foundation article at ${path}`, async () => {
     const response = await render(path);
     assert.equal(response.status, 200);
 
     const html = await response.text();
     assert.match(html, heading);
+    assert.match(html, visualHeading);
     assert.match(html, /Три вопроса без подвоха/);
     assert.match(html, /Карточки по странице/);
     assert.match(html, /Материал для обучения, не инвестиционная рекомендация/);

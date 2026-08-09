@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   FOUNDATION_ARTICLES,
   FOUNDATION_CARDS,
@@ -790,6 +790,185 @@ function FoundationHeroVisual({
   );
 }
 
+function ConceptVisualFrame({
+  pageId,
+  eyebrow,
+  title,
+  caption,
+  children,
+}: {
+  pageId: FoundationPageId;
+  eyebrow: string;
+  title: string;
+  caption: string;
+  children: ReactNode;
+}) {
+  const titleId = `concept-visual-${pageId}`;
+
+  return (
+    <figure className={`concept-visual visual-${pageId}`} aria-labelledby={titleId}>
+      <figcaption>
+        <span>{eyebrow}</span>
+        <strong id={titleId}>{title}</strong>
+        <p>{caption}</p>
+      </figcaption>
+      <div className="concept-visual-stage">{children}</div>
+    </figure>
+  );
+}
+
+function FoundationConceptVisual({ pageId }: { pageId: FoundationPageId }) {
+  switch (pageId) {
+    case "investment-basics":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Карта решения"
+          title="Продукт появляется в самом конце"
+          caption="Каждый следующий шаг зависит от предыдущего: начинать с инструмента — значит пропустить условия задачи."
+        >
+          <div className="decision-flow">
+            <div><span>01</span><strong>Цель</strong><small>что должно стать возможным</small></div>
+            <i>→</i>
+            <div><span>02</span><strong>Резерв</strong><small>что нельзя подвергать риску</small></div>
+            <i>→</i>
+            <div><span>03</span><strong>Срок и риск</strong><small>когда нужны деньги и какую потерю выдержит план</small></div>
+            <i>→</i>
+            <div className="visual-accent"><span>04</span><strong>Продукт</strong><small>подходящий под заданные условия</small></div>
+          </div>
+        </ConceptVisualFrame>
+      );
+
+    case "financial-goals":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Конструктор цели"
+          title="Желание становится расчётной задачей"
+          caption="Если отсутствует хотя бы один параметр, нельзя проверить реалистичность плана и подобрать допустимый риск."
+        >
+          <div className="goal-grid">
+            <div><span>₽</span><strong>Сумма</strong><small>сколько потребуется</small></div>
+            <div><span>◷</span><strong>Срок</strong><small>к какой дате</small></div>
+            <div><span>!</span><strong>Приоритет</strong><small>насколько цель обязательна</small></div>
+            <div><span>↗</span><strong>Потоки</strong><small>как пополняется капитал</small></div>
+            <p><b>4 параметра</b><em>→</em><strong>проверяемый финансовый план</strong></p>
+          </div>
+        </ConceptVisualFrame>
+      );
+
+    case "risk-return":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Сценарная линза"
+          title="Одна ожидаемая доходность скрывает разные исходы"
+          caption="Риск оценивают не только по вероятности: важны размер потери и последствия этой потери для цели."
+        >
+          <div className="scenario-chart">
+            <div className="scenario positive"><span>+18%</span><i></i><strong>Благоприятный</strong></div>
+            <div className="scenario neutral"><span>+7%</span><i></i><strong>Базовый</strong></div>
+            <div className="scenario negative"><span>−14%</span><i></i><strong>Неблагоприятный</strong></div>
+          </div>
+          <div className="risk-equation"><span>вероятность</span><b>×</b><span>размер потери</span><b>×</b><span>последствия</span><strong>= риск для плана</strong></div>
+        </ConceptVisualFrame>
+      );
+
+    case "horizon-liquidity":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Временные корзины"
+          title="Деньги получают разную свободу движения"
+          caption="Чем ближе расход, тем важнее доступность капитала и тем опаснее зависеть от удачного момента продажи."
+        >
+          <div className="horizon-track">
+            <div className="horizon-now"><span>Сейчас</span><strong>Резерв</strong><small>максимальный доступ<br />минимум рыночного риска</small></div>
+            <i>→</i>
+            <div className="horizon-soon"><span>1–3 года</span><strong>Близкие цели</strong><small>ликвидность важнее<br />потенциала роста</small></div>
+            <i>→</i>
+            <div className="horizon-later"><span>5+ лет</span><strong>Долгие цели</strong><small>больше времени<br />пережить колебания</small></div>
+          </div>
+          <div className="liquidity-scale"><span>быстрый доступ</span><i></i><span>долгий горизонт</span></div>
+        </ConceptVisualFrame>
+      );
+
+    case "inflation-real-return":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Два слоя результата"
+          title="Рост суммы ещё не означает рост возможностей"
+          caption="Номинальная доходность показывает изменение денег, реальная — изменение их покупательной способности."
+        >
+          <div className="return-layers">
+            <div className="nominal-layer"><span>Номинальный рост</span><strong>+10%</strong><small>1 000 000 ₽ → 1 100 000 ₽</small></div>
+            <b>−</b>
+            <div className="inflation-layer"><span>Рост цен</span><strong>7%</strong><small>та же корзина стала дороже</small></div>
+            <b>≈</b>
+            <div className="real-layer"><span>Реальный рост</span><strong>+3%</strong><small>прибавка покупательной способности</small></div>
+          </div>
+        </ConceptVisualFrame>
+      );
+
+    case "compound-interest":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Эффект времени"
+          title="Доход начинает приносить новый доход"
+          caption="При реинвестировании база расчёта растёт каждый период, поэтому траектория постепенно изгибается вверх."
+        >
+          <div className="compound-chart">
+            <div><i></i><span>Старт</span><strong>100</strong></div>
+            <div><i></i><span>1 год</span><strong>110</strong></div>
+            <div><i></i><span>3 года</span><strong>133</strong></div>
+            <div><i></i><span>5 лет</span><strong>161</strong></div>
+            <div><i></i><span>10 лет</span><strong>259</strong></div>
+          </div>
+          <p className="visual-footnote">Условный пример: 100 единиц под 10% годовых с ежегодным реинвестированием, без налогов и комиссий.</p>
+        </ConceptVisualFrame>
+      );
+
+    case "investor-profile":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Пересечение ограничений"
+          title="Допустимый риск задаёт самое слабое звено"
+          caption="Высокая готовность рисковать не компенсирует короткий срок, нехватку резерва или непонимание инструмента."
+        >
+          <div className="profile-merge">
+            <div><span>Могу</span><strong>финансовая способность</strong><small>план переживёт потерю</small></div>
+            <i>↘</i>
+            <div><span>Готов</span><strong>психологическая устойчивость</strong><small>решение не изменится в панике</small></div>
+            <i>↙</i>
+            <div><span>Понимаю</span><strong>знания и опыт</strong><small>осознаны механика и риски</small></div>
+            <b>минимум из трёх → допустимый риск</b>
+          </div>
+        </ConceptVisualFrame>
+      );
+
+    case "asset-classes":
+      return (
+        <ConceptVisualFrame
+          pageId={pageId}
+          eyebrow="Карта ролей"
+          title="Класс актива выбирают по функции в портфеле"
+          caption="Доходность — только одна характеристика. Важно, какую задачу актив решает и какой риск добавляет всей системе."
+        >
+          <div className="asset-spectrum">
+            <div className="asset-cash"><span>01</span><strong>Деньги</strong><small>ликвидность и резерв</small><i></i></div>
+            <div className="asset-bonds"><span>02</span><strong>Облигации</strong><small>поток и умеренный риск</small><i></i></div>
+            <div className="asset-stocks"><span>03</span><strong>Акции</strong><small>долгосрочный рост</small><i></i></div>
+            <div className="asset-real"><span>04</span><strong>Реальные активы</strong><small>иная природа риска</small><i></i></div>
+          </div>
+          <div className="asset-axis"><span>доступность</span><i></i><span>неопределённость результата</span></div>
+        </ConceptVisualFrame>
+      );
+  }
+}
+
 function FoundationArticle({ pageId }: { pageId: FoundationPageId }) {
   const article = FOUNDATION_ARTICLES[pageId];
 
@@ -817,6 +996,7 @@ function FoundationArticle({ pageId }: { pageId: FoundationPageId }) {
             </article>
           ))}
         </div>
+        <FoundationConceptVisual pageId={pageId} />
       </section>
 
       <section className="article-section" id="practice">
