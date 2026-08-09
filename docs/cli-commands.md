@@ -17,6 +17,16 @@ cd '/Users/vasilijbalin/python/projects/bank_wiki'
 pnpm run dev
 ```
 
+## Стабильная локальная версия
+
+```bash
+# собрать стабильную версию; команда обновляет только генерируемую папку dist
+pnpm run build
+
+# запустить стабильную версию на http://localhost:3001; процесс работает до Ctrl+C
+pnpm start
+```
+
 ## Проверка
 
 ```bash
